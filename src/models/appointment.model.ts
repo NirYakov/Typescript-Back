@@ -1,13 +1,15 @@
 interface Appointment {
-    id: number,
+    id?: number,
 
-    startTime: string,
+    petId: number,
 
-    endTime: string,
+    startTime: Date,
+
+    endTime: Date,
 
     feePaidBy: string, // dollar or euro or Canadian dollar /unpaid 
 
-    amount: string,
+    amount: number,
 }
 
 // dollar or euro or Canadian dollar /unpaid 

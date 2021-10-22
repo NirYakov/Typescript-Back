@@ -1,10 +1,10 @@
 
 interface Patient {
-    id: number,
+    id?: number,
 
-    patName: string,
+    petName: string,
 
-    patType: string,
+    petType: string,
 
     ownerName: string,
 

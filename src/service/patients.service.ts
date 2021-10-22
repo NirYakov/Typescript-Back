@@ -4,6 +4,7 @@ import { FilterQuery, UpdateQuery } from "mongoose";
 import Patient from "../models/patient.model";
 
 import axios from 'axios';
+import getRandomInt from "../utills/randomInt";
 
 // import fetch from 'node-fetch';
 
@@ -11,58 +12,48 @@ export async function getPatients() {
     return patients;
 }
 
-
-const petFoodBarcodes =
-    [
-        "20106836", "3760026300986", "0064992500115",
-        "8480000520975", "3596710314454", "0730582000524",
-
-        "4008239310002", "7613036724258", "4388860186727",
-        "4053222560735", "3560070495429", "4099100129434",
-    ];
+export async function deletePatientById(id: number) 
+{
+    const patient = patients.find( n => n.id == id);
     
-
-function getRandomInt(max: number) {
-    return Math.floor(Math.random() * max);
-}
-
-export async function getPatientById(id: number) {
-    let petTypeFood = "";
-    const patient = patients[id];
-    const rndFoodIndex = getRandomInt(12);
-
-
-    await axios({
-        method: 'get',
-        url: `https://world.openpetfoodfacts.org/api/v0/product/${petFoodBarcodes[rndFoodIndex]}.json`,
-    })
-        .then(function (response: any) {
-            // response.data.pipe(fs.createWriteStream('ada_lovelace.jpg'))
-            petTypeFood = response.data.product.product_name;
-            console.log("RESPONSE: ", petTypeFood);
-            // patient.petTypeFood = petTypeFood;
-
-        }).catch(e => {
-            console.log({
-                message: "oops :(",
-                error: e,
-            })
-        });
-
-    patient.petTypeFood = petTypeFood;
+    patients.splice(id, 1);
 
     return patient;
 }
 
+export async function addNewPatient( patient: Patient) 
+{
+    const lastId = patients[patients.length-1].id;
+    patient.id = lastId;
+
+    patient.id = getRandomInt(2_000_000_000);
+
+    patients.push(patient);
+
+    return true;
+}
+
+
+export async function getPatientById(id: number) {
+   
+    const patient = patients.find( n => n.id == id);
+    return patient;
+}
+
+export async function getPatientByName(name: string) {
+   
+    const patient = patients.find( n => n.petType == name);
+    return patient;
+}
 
 const patients: Patient[] =
     [
         {
             id: 0,
 
-            patName: "ray",
+            petName: "ray",
 
-            patType: "dog",
+            petType: "dog",
 
             ownerName: "ray ray",
 
@@ -70,13 +61,13 @@ const patients: Patient[] =
 
             ownerPhone: "050-1112230",
 
-            petTypeFood: ""
+            petTypeFood: "Fusées"
         },
         {
             id: 1,
-            patName: "ben",
+            petName: "ben",
 
-            patType: "cat",
+            petType: "cat",
 
             ownerName: "ben ben",
 
@@ -84,13 +75,13 @@ const patients: Patient[] =
 
             ownerPhone: "050-1112239",
 
-            petTypeFood: ""
+            petTypeFood: "Leckerlie Mix"
         },
         {
             id: 2,
-            patName: "yan",
+            petName: "yan",
 
-            patType: "mouse",
+            petType: "mouse",
 
             ownerName: "yan yan",
 
@@ -98,13 +89,13 @@ const patients: Patient[] =
 
             ownerPhone: "059-1112239",
 
-            petTypeFood: ""
+            petTypeFood: "Salmon and Sweet Potato Recipe Dog Food"
         },
         {
             id: 3,
-            patName: "may",
+            petName: "may",
 
-            patType: "fox",
+            petType: "fox",
 
             ownerName: "may may",
 
@@ -112,13 +103,13 @@ const patients: Patient[] =
 
             ownerPhone: "050-1112232",
 
-            petTypeFood: ""
+            petTypeFood: "Leckerlie Mix"
         },
         {
             id: 4,
-            patName: "ran",
+            petName: "ran",
 
-            patType: "cat",
+            petType: "cat",
 
             ownerName: "ran ran",
 
@@ -126,6 +117,6 @@ const patients: Patient[] =
 
             ownerPhone: "050-1112234",
 
-            petTypeFood: ""
+            petTypeFood: "Salchicha con ternera y zanahoria"
         },
     ];
