@@ -1,6 +1,7 @@
 
 interface Patient {
-    id?: number,
+    
+    _id?: string,
 
     petName: string,
 
@@ -17,17 +18,3 @@ interface Patient {
 
 
 export default Patient;
-
-// patient details :
-
-// patName
-
-// patType
-
-// ownerName
-
-// ownerAddress
-
-// ownerPhone
-
-// petTypeFood

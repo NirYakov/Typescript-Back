@@ -1,17 +1,20 @@
-interface Appointment {
-    id?: number,
 
-    petId: number,
+
+interface Appointment {
+    _id?: string,
+
+    petId: string,
 
     startTime: Date,
 
     endTime: Date,
 
-    feePaidBy: string, // dollar or euro or Canadian dollar /unpaid 
+    feePaidBy: string, 
 
     amount: number,
+
+    amountInAmericanDollar?: number,
 }
 
-// dollar or euro or Canadian dollar /unpaid 
 
 export default Appointment;

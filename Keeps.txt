@@ -3,3 +3,5 @@ http://localhost:1337
 
 Nir
 Zyx0JCEY4RX2XkwbJsa
+
+mongodb+srv://Nir:JCEY4RX2XkwbJsa@cluster0.3caor.mongodb.net/Veterinarian-Hospital-Data-API

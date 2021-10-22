@@ -1,5 +1,5 @@
 import { Express, Request, Response } from "express";
-import { deleteAppointment, getAppointment, getAppointmentDay } from "./controller/appointment.controller";
+import { addAppointment, deleteAppointment, getAppointment, getAppointmentDay } from "./controller/appointment.controller";
 import { addPatient, deletePatient, getAllPatients, getPatient } from './controller/patients.controller';
 
 
@@ -26,13 +26,13 @@ function routes(app: Express) {
 
     app.get('/appointments/:id', getAppointment ); // Get a list of all appointments for a specific patient 
     
-    app.post('/appointments', );
+    app.post('/appointments', addAppointment);
     
     app.put('/appointments/:id', ); // Update appointment details 
 
     app.delete('/appointments/:id',  deleteAppointment); // Delete appointment details 
 
-    
+
     // part B
 
     app.get('/appointments/day/:date',  getAppointmentDay); // Get a list of appointments for a specific day 

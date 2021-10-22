@@ -14,11 +14,12 @@ app.listen(port , async () => {
 
     logger.info(`App is running at http://localhost:${port}`);
    
-    // console.log(`App is running at http://localhost:${port}`);
     
-
-   // await connect();
-
+    
+    await connect();
+    
+    console.log(`App is running at http://localhost:${port}`);
+    
    routes(app);
 
 });
