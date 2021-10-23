@@ -9,7 +9,9 @@ interface Appointment {
 
     endTime: Date,
 
-    feePaidBy: string, 
+    description: string,
+
+    feePaidBy: string,
 
     amount: number,
 

@@ -8,15 +8,12 @@ import axios from 'axios';
 import PatientModel from '../models/Schema/patient.schema';
 import { getRandomInt } from "../utills/randomInt";
 
-// import fetch from 'node-fetch';
-
-let patients: Patient[];
+let patients: Patient[] = [];
 
 export async function getPatients() {
 
     await PatientModel.find()
         .then(async documents => {
-            // console.log(documents);
 
             patients = documents;
             return patients;
@@ -29,13 +26,14 @@ export async function getPatients() {
 }
 
 export async function deletePatientById(id: string) {
-    const index = patients.findIndex(n => n._id == id);
-    const patient = patients[index];
+    // const index = patients.findIndex(n => n._id == id);
+    // const patient = patients[index];
 
+    // if (!index) {
+    //     patients.splice(index, 1);
+    // }
 
-    patients.splice(index, 1);
-
-    await PatientModel.findByIdAndDelete(id);
+    const patient = await PatientModel.findByIdAndDelete(id);
 
     return patient;
 }
@@ -74,13 +72,35 @@ export async function addNewPatient(patient: Patient) {
 
 export async function getPatientById(id: string) {
 
-    const patient = patients.find(n => n._id == id);
+    let patient = patients.find(n => n._id == id);;
+
+    if (!patient) {
+        patient = await getPatientByIdFromDb(id);
+    }
+
     return patient;
 }
+
 
 export async function getPatientByName(name: string) {
 
     const patient = patients.find(n => n.petType == name);
+    return patient;
+}
+
+
+export async function getPatientByIdFromDb(id: string) {
+    let patient: Patient | undefined = undefined;
+
+    await PatientModel.findById(id)
+        .then(async document => {
+            patient = document !== null ? document : undefined;
+            return patient;
+        })
+        .catch(err => {
+            console.log("Error : ", err);
+        });
+
     return patient;
 }
 

@@ -2,20 +2,21 @@ import { Request, Response } from "express";
 import config from "config";
 import Appointment from "../models/appointment.model";
 import axios from "axios";
-import { addNewAppointment, deleteAppointmentById, getAppointmentsForDay, getAppointmentsForPatient } from '../service/appointments.service'
+import { addNewAppointment, deleteAppointmentById, getAllUnpaidAppointments, getAppointmentsForDay, getAppointmentsForPatient } from '../service/appointments.service'
 
 const port = config.get<number>("port");
 
-export async function getAppointment(req: Request, res: Response) {
+export async function getAppointments(req: Request, res: Response) {
     const id = req.params.id;
 
-    const appointment = await getAppointmentsForPatient(id);
+    const patAppointments = await getAppointmentsForPatient(id);
 
-    console.log("Controller appointment : ", appointment);
+    if (!patAppointments || patAppointments.length < 1) {
+        return res.sendStatus(404);
+    }
 
-    return res.send(appointment);
+    return res.send(patAppointments);
 }
-
 
 
 export async function getAppointmentDay(req: Request, res: Response) {
@@ -28,7 +29,6 @@ export async function getAppointmentDay(req: Request, res: Response) {
 
 
 export async function addAppointment(req: Request, res: Response) {
-    const date = new Date(req.params.date);
 
     const appointment: Appointment =
     {
@@ -37,6 +37,8 @@ export async function addAppointment(req: Request, res: Response) {
         startTime: new Date(req.body.startTime),
 
         endTime: new Date(req.body.endTime),
+
+        description: req.body.description,
 
         feePaidBy: req.body.feePaidBy,
 
@@ -49,8 +51,24 @@ export async function addAppointment(req: Request, res: Response) {
 
     return res.status(201).send(
         {
-            linkToCreatedById: `http://localhost:${port}/patients/${appointment._id}`,
+            linkToCreatedById: `http://localhost:${port}/appointments/${appointment.petId}`,
             appointment: appointmentResult
+        });
+}
+
+export async function getUnpaidAppointments(req: Request, res: Response) {
+
+    const unpaidAppointments = await getAllUnpaidAppointments();
+
+    console.log("unpaidAppointments : ", unpaidAppointments);
+
+    if (!unpaidAppointments || unpaidAppointments.length < 1) {
+        return res.sendStatus(404);
+    }
+
+    return res.status(200).send(
+        {
+            unpaidAppointments: unpaidAppointments
         });
 }
 

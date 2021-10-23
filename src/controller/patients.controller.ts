@@ -27,6 +27,10 @@ export async function getPatient(req: Request, res: Response) {
 
     const patient = await getPatientById(id);
 
+    if(!patient) 
+    {
+        return res.sendStatus(404);
+    }
 
     return res.send(patient);
 }
