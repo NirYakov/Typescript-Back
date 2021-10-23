@@ -1,5 +1,5 @@
 import { Express, Request, Response } from "express";
-import { addAppointment, deleteAppointment, getAppointments, getAppointmentDay, getUnpaidAppointments } from "./controller/appointment.controller";
+import { addAppointment, deleteAppointment, getAppointments, getAppointmentDay, getUnpaidAppointments, getPatientBill } from "./controller/appointment.controller";
 import { addPatient, deletePatient, getAllPatients, getPatient } from './controller/patients.controller';
 
 
@@ -23,21 +23,23 @@ function routes(app: Express) {
     app.delete('/patients/:id', deletePatient); // Delete patient details 
 
     ///// part 2
-    app.get('/appointments/unpaid', getUnpaidAppointments); // Get a list of unpaid appointments 
-
+    app.get('/appointments/unpaid', getUnpaidAppointments); // [B.2] Get a list of unpaid appointments 
+    
+    
     app.get('/appointments/:id', getAppointments); // Get a list of all appointments for a specific patient 
-
+    
     app.post('/appointments', addAppointment);
-
+    
     app.put('/appointments/:id',); // Update appointment details 
-
+    
     app.delete('/appointments/:id', deleteAppointment); // Delete appointment details 
-
-
+    
+    
     // part B
-
-    app.get('/appointments/day/:date', getAppointmentDay); // Get a list of appointments for a specific day 
-
+    
+    app.get('/appointments/day/:date', getAppointmentDay); // [B.1] Get a list of appointments for a specific day 
+    
+    app.get('/patientbill/:id', getPatientBill ); // [B.3] Get a list of unpaid appointments 
 
     // Get a remaining bill for a specific patient  
 }

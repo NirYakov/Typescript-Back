@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+
+    "types": ["jest"],
+    "noEmit": true,   
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
     "outDir" : "build",
     /* Projects */
@@ -96,5 +99,6 @@
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
-  }
+  },
+  "include": ["./src/**/*"]
 }

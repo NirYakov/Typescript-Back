@@ -8,14 +8,14 @@ import axios from 'axios';
 import PatientModel from '../models/Schema/patient.schema';
 import { getRandomInt } from "../utills/randomInt";
 
-let patients: Patient[] = [];
 
 export async function getPatients() {
+let patients : Patient[] = [];
 
     await PatientModel.find()
         .then(async documents => {
 
-            patients = documents;
+            patients = documents !== null ? documents : patients;
             return patients;
         })
         .catch(err => {
@@ -26,13 +26,7 @@ export async function getPatients() {
 }
 
 export async function deletePatientById(id: string) {
-    // const index = patients.findIndex(n => n._id == id);
-    // const patient = patients[index];
-
-    // if (!index) {
-    //     patients.splice(index, 1);
-    // }
-
+  
     const patient = await PatientModel.findByIdAndDelete(id);
 
     return patient;
@@ -60,11 +54,9 @@ export async function addNewPatient(patient: Patient) {
 
     await doc.save();
 
-    console.log(doc);
+  //  console.log(doc);
 
     patient._id = doc._id;
-
-    patients.push(patient);
 
     return patient;
 }
@@ -72,19 +64,8 @@ export async function addNewPatient(patient: Patient) {
 
 export async function getPatientById(id: string) {
 
-    let patient = patients.find(n => n._id == id);;
+ const   patient = await getPatientByIdFromDb(id);
 
-    if (!patient) {
-        patient = await getPatientByIdFromDb(id);
-    }
-
-    return patient;
-}
-
-
-export async function getPatientByName(name: string) {
-
-    const patient = patients.find(n => n.petType == name);
     return patient;
 }
 
@@ -103,6 +84,8 @@ export async function getPatientByIdFromDb(id: string) {
 
     return patient;
 }
+
+
 
 // const subs = await CompetitionModel.findOneAndUpdate(
 // { id: req.params.id }, // <------ req.params.id is what you should pass.
@@ -125,8 +108,6 @@ export async function getPetFood(): Promise<string> {
         .then(function (response: any) {
             // response.data.pipe(fs.createWriteStream('ada_lovelace.jpg'))
             petTypeFood = response.data.product.product_name;
-            console.log("RESPONSE: ", petTypeFood);
-            // patient.petTypeFood = petTypeFood;
             return petTypeFood;
 
         }).catch(e => {

@@ -12,23 +12,15 @@ export async function getAllPatients(req: Request, res: Response) {
 
     const patients = await getPatients();
 
-    // console.log("Controller : ", patients);
-
     return res.send(patients);
 }
-
-// app.post('/test', (req, res) => {
-//     res.json({requestBody: req.body})  // <==== req.body will be a parsed JSON object
-//   })
-
 
 export async function getPatient(req: Request, res: Response) {
     const id = req.params.id;
 
     const patient = await getPatientById(id);
 
-    if(!patient) 
-    {
+    if (!patient) {
         return res.sendStatus(404);
     }
 
@@ -38,19 +30,24 @@ export async function getPatient(req: Request, res: Response) {
 
 export async function addPatient(req: Request, res: Response) {
 
-    // console.log(req.body);
+    const {petName , petType , ownerName , ownerAddress , ownerPhone} = req.body;
+
+    if(!petName || !petType || !ownerName || !ownerAddress  || !ownerPhone) 
+    {
+        return res.sendStatus(404);
+    }
 
     const patient: Patient =
     {
-        petName: req.body.petName,
+        petName: petName,
 
-        petType: req.body.petType,
+        petType: petType,
 
-        ownerName: req.body.ownerName,
+        ownerName: ownerName,
 
-        ownerAddress: req.body.ownerAddress,
+        ownerAddress: ownerAddress,
 
-        ownerPhone: req.body.ownerPhone,
+        ownerPhone: ownerPhone,
 
         petTypeFood: ""
     };
@@ -60,7 +57,6 @@ export async function addPatient(req: Request, res: Response) {
     return res.status(201).send(
         {
             linkToCreatedById: `http://localhost:${port}/patients/${patient._id}`,
-            linkToCreatedName: `http://localhost:${port}/patients/${patient.petName}`,
             patient: patient
         });
 }
@@ -76,6 +72,8 @@ export async function deletePatient(req: Request, res: Response) {
         }
     );
 }
+
+
 
 
 

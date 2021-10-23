@@ -5,16 +5,13 @@ import { TwoAfterThePointRound } from "../utills/randomInt";
 import AppointmentModel from "../models/Schema/appointment.schema";
 
 
-let appointments: Appointment[] = [];
-
 
 export async function getAppointments() {
+    let appointments: Appointment[] = [];
 
     await AppointmentModel.find()
         .then(async documents => {
-            // console.log(documents);
-
-            appointments = documents;
+            appointments = documents ? documents : appointments;
             return appointments;
         })
         .catch(err => {
@@ -26,39 +23,32 @@ export async function getAppointments() {
 
 export async function getAppointmentsForPatient(petId: string) {
 
-    let patientAppointments = appointments.filter(n => n.petId == petId);
-
-    if (!patientAppointments) {
-        patientAppointments = await getAppointmentsByIdFromDb(petId);
-    }
+    const patientAppointments = await getAppointmentsByIdFromDb(petId);
 
     return patientAppointments;
 }
 
 export async function deleteAppointmentById(id: string) {
-    //const index = appointments.findIndex(n => n._id == id);
-    // const appointment = appointments[index];
-    //appointments.splice(index, 1);
 
     const appointment = await AppointmentModel.findByIdAndDelete(id);
-    
+
     return appointment;
 }
 
 
 export async function getAppointmentsByIdFromDb(id: string) {
-    let appointment: Appointment[] | undefined = undefined;
+    let appointments: Appointment[] = [];
 
-    await AppointmentModel.find({ _id: id })
+    await AppointmentModel.find({ petId: id })
         .then(async document => {
-            appointment = document !== null ? document : undefined;
-            return appointment;
+            appointments = document !== null ? document : appointments;
+            return appointments;
         })
         .catch(err => {
             console.log("Error : ", err);
         });
 
-    return appointment || [];
+    return appointments;
 }
 
 export async function addNewAppointment(appointment: Appointment) {
@@ -87,13 +77,7 @@ export async function addNewAppointment(appointment: Appointment) {
 
     await doc.save();
 
-    console.log("doc : ", doc);
-
     appointment._id = doc._id;
-
-    console.log("appointment : ", appointment);
-
-    appointments.push(appointment);
 
     return appointment;
 }
@@ -138,6 +122,7 @@ export async function getRateToDollar(moneyAmount: number, feePaidBy: string) {
 
 export async function getAppointmentsForDay(date: Date) {
 
+    const appointments = await getAppointments();
     const patientAppointments = appointments.filter(
         n => {
             if ((n.startTime.getDay() == date.getDay()) &&
@@ -148,6 +133,7 @@ export async function getAppointmentsForDay(date: Date) {
             return false;
         });
 
+
     return patientAppointments;
 }
 
@@ -155,23 +141,23 @@ export async function getAppointmentsForDay(date: Date) {
 export async function getAllUnpaidAppointments() {
 
     let getUnpaidAppointment: Appointment[];
-    getUnpaidAppointment = appointmentsDummy.filter( n => n.feePaidBy === "unpaid");//await getAppointmentsByUnpaidFromDb();
+    getUnpaidAppointment = await getAppointmentsByUnpaidFromDb();
     return getUnpaidAppointment;
 }
 
 export async function getAppointmentsByUnpaidFromDb() {
-    let appointment: Appointment[] | undefined = undefined;
+    let appointmentsUnpaid: Appointment[] = [];
 
     await AppointmentModel.find({ feePaidBy: 'unpaid' })
         .then(async document => {
-            appointment = document !== null ? document : undefined;
-            return appointment;
+            appointmentsUnpaid = document !== null ? document : appointmentsUnpaid;
+            return appointmentsUnpaid;
         })
         .catch(err => {
             console.log("Error : ", err);
         });
 
-    return appointment || [];
+    return appointmentsUnpaid;
 }
 
 function checkifEuro(moneyRate: string): boolean {
@@ -182,6 +168,25 @@ function checkifCandianDollar(moneyRate: string): boolean {
     return moneyRate == 'Canadian dollar' || moneyRate == 'C$' || moneyRate == 'Can$' || moneyRate == 'CAD$' || moneyRate == 'CAD';
 }
 
+export async function getPatientBillById(id: string) {
+
+    let appointmentsUnpaid: Appointment[] = [];
+
+    await AppointmentModel.find({ petId: id, feePaidBy: 'unpaid' })
+        .then(async document => {
+            appointmentsUnpaid = document !== null ? document : appointmentsUnpaid;
+            return appointmentsUnpaid;
+        })
+        .catch(err => {
+            console.log("Error : ", err);
+        });
+
+    let totalUnpaid = 0.0;
+    appointmentsUnpaid.forEach(n => totalUnpaid += n.amount);
+
+
+    return totalUnpaid;
+}
 
 const appointmentsDummy: Appointment[] =
     [

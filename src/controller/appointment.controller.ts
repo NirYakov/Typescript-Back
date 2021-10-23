@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import config from "config";
 import Appointment from "../models/appointment.model";
 import axios from "axios";
-import { addNewAppointment, deleteAppointmentById, getAllUnpaidAppointments, getAppointmentsForDay, getAppointmentsForPatient } from '../service/appointments.service'
+import { addNewAppointment, deleteAppointmentById, getAllUnpaidAppointments, getAppointmentsForDay, getAppointmentsForPatient, getPatientBillById } from '../service/appointments.service'
 
 const port = config.get<number>("port");
 
@@ -11,7 +11,7 @@ export async function getAppointments(req: Request, res: Response) {
 
     const patAppointments = await getAppointmentsForPatient(id);
 
-    if (!patAppointments || patAppointments.length < 1) {
+    if (patAppointments.length < 1) {
         return res.sendStatus(404);
     }
 
@@ -86,3 +86,15 @@ export async function deleteAppointment(req: Request, res: Response) {
 
 
 
+export async function getPatientBill(req: Request, res: Response) {
+
+    const id = req.params.id;
+    const patientBill = await getPatientBillById(id);
+
+    return res.status(200).send(
+        {
+            patientBill: `${patientBill}$`
+        }
+    );
+
+}
