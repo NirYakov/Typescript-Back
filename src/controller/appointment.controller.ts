@@ -2,14 +2,16 @@ import { Request, Response } from "express";
 import config from "config";
 import Appointment from "../models/appointment.model";
 import axios from "axios";
-import { addNewAppointment, deleteAppointmentById, getAllUnpaidAppointments, getAppointmentsForDay, getAppointmentsForPatient, getPatientBillById } from '../service/appointments.service'
+import { diService } from "../app";
 
 const port = config.get<number>("port");
+
+
 
 export async function getAppointments(req: Request, res: Response) {
     const id = req.params.id;
 
-    const patAppointments = await getAppointmentsForPatient(id);
+    const patAppointments = await diService.diAppointmentSevice.getAppointmentsForPatient(id);
 
     if (patAppointments.length < 1) {
         return res.sendStatus(404);
@@ -22,7 +24,7 @@ export async function getAppointments(req: Request, res: Response) {
 export async function getAppointmentDay(req: Request, res: Response) {
     const date = new Date(req.params.date);
 
-    const appointment = await getAppointmentsForDay(date);
+    const appointment = await diService.diAppointmentSevice.getAppointmentsForDay(date);
 
     return res.send(appointment);
 }
@@ -66,7 +68,7 @@ export async function addAppointment(req: Request, res: Response) {
         amountInAmericanDollar: amount
     };
 
-    const appointmentResult = await addNewAppointment(appointment);
+    const appointmentResult = await diService.diAppointmentSevice.addNewAppointment(appointment);
 
     return res.status(201).send(
         {
@@ -77,7 +79,7 @@ export async function addAppointment(req: Request, res: Response) {
 
 export async function getUnpaidAppointments(req: Request, res: Response) {
 
-    const unpaidAppointments = await getAllUnpaidAppointments();
+    const unpaidAppointments = await diService.diAppointmentSevice.getAllUnpaidAppointments();
 
     console.log("unpaidAppointments : ", unpaidAppointments);
 
@@ -94,7 +96,7 @@ export async function getUnpaidAppointments(req: Request, res: Response) {
 export async function deleteAppointment(req: Request, res: Response) {
 
     const id = req.params.id;
-    const appointment = await deleteAppointmentById(id);
+    const appointment = await diService.diAppointmentSevice.deleteAppointmentById(id);
 
     return res.status(200).send(
         {
@@ -108,7 +110,7 @@ export async function deleteAppointment(req: Request, res: Response) {
 export async function getPatientBill(req: Request, res: Response) {
 
     const id = req.params.id;
-    const patientBill = await getPatientBillById(id);
+    const patientBill = await diService.diAppointmentSevice.getPatientBillById(id);
 
     return res.status(200).send(
         {

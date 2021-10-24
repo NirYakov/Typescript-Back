@@ -1,24 +1,23 @@
 import { Request, Response } from "express";
 import config from "config";
-import { getPatients, getPatientById, addNewPatient, deletePatientById } from '../service/patients.service'
 import Patient from "../models/patient.model";
 import axios from "axios";
 import { getRandomInt } from "../utills/randomInt";
+import { diService } from "../app";
 
 const port = config.get<number>("port");
 
-
 export async function getAllPatients(req: Request, res: Response) {
 
-    const patients = await getPatients();
-
+    const patients =  await diService.diPateintSevice.getPatients();
+   
     return res.send(patients);
 }
 
 export async function getPatient(req: Request, res: Response) {
     const id = req.params.id;
 
-    const patient = await getPatientById(id);
+    const patient = await diService.diPateintSevice.getPatientById(id);
 
     if (!patient) {
         return res.sendStatus(404);
@@ -52,7 +51,7 @@ export async function addPatient(req: Request, res: Response) {
         petTypeFood: ""
     };
 
-    await addNewPatient(patient);
+    await diService.diPateintSevice.addNewPatient(patient);
 
     return res.status(201).send(
         {
@@ -64,7 +63,7 @@ export async function addPatient(req: Request, res: Response) {
 export async function deletePatient(req: Request, res: Response) {
 
     const id = req.params.id;
-    const patient = await deletePatientById(id);
+    const patient = await diService.diPateintSevice.deletePatientById(id);
 
     return res.status(200).send(
         {

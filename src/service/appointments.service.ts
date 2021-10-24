@@ -3,190 +3,172 @@ import mongoose from 'mongoose';
 import axios from "axios";
 import { TwoAfterThePointRound } from "../utills/randomInt";
 import AppointmentModel from "../models/Schema/appointment.schema";
+import { IAppointmentService } from "./interfaces-services/appointments.interface";
 
 
 
-export async function getAppointments() {
-    let appointments: Appointment[] = [];
+export class AppointmentServiceMock implements IAppointmentService {
 
-    await AppointmentModel.find()
-        .then(async documents => {
-            appointments = documents ? documents : appointments;
-            return appointments;
-        })
-        .catch(err => {
-            console.log("Error : ", err);
-        });
+    getAppointments(): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    getAppointmentsForPatient(petId: string): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    deleteAppointmentById(id: string): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    getAppointmentsByIdFromDb(id: string): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
 
-    return appointments;
+    async addNewAppointment(appointment: Appointment): Promise<any> {
+
+    }
+
+    getRateToDollar(moneyAmount: number, feePaidBy: string): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    getAppointmentsForDay(date: Date): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    getAllUnpaidAppointments(): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    getAppointmentsByUnpaidFromDb(): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    getPatientBillById(id: string): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+
 }
 
-export async function getAppointmentsForPatient(petId: string) {
+export class AppointmentService implements IAppointmentService {
+    async getAppointments(): Promise<any> {
+        return await AppointmentModel.find();
+    }
+    async getAppointmentsForPatient(petId: string): Promise<any> {
 
-    const patientAppointments = await getAppointmentsByIdFromDb(petId);
+        return await this.getAppointmentsByIdFromDb(petId);
 
-    return patientAppointments;
-}
+    }
+    async deleteAppointmentById(id: string): Promise<any> {
+        return await AppointmentModel.findByIdAndDelete(id);
 
-export async function deleteAppointmentById(id: string) {
+    }
+    async getAppointmentsByIdFromDb(id: string): Promise<any> {
+        return await AppointmentModel.find({ petId: id });
+    }
+    async addNewAppointment(appointment: Appointment): Promise<any> {
 
-    const appointment = await AppointmentModel.findByIdAndDelete(id);
+        const rateMoneyToDollar = await this.getRateToDollar(appointment.amount, appointment.feePaidBy);
 
-    return appointment;
-}
+        appointment.amountInAmericanDollar = rateMoneyToDollar;
 
+        const doc = new AppointmentModel(
+            {
+                petId: appointment.petId,
 
-export async function getAppointmentsByIdFromDb(id: string) {
-    let appointments: Appointment[] = [];
+                startTime: appointment.startTime,
 
-    await AppointmentModel.find({ petId: id })
-        .then(async document => {
-            appointments = document !== null ? document : appointments;
-            return appointments;
-        })
-        .catch(err => {
-            console.log("Error : ", err);
-        });
+                endTime: appointment.endTime,
 
-    return appointments;
-}
+                description: appointment.description,
 
-export async function addNewAppointment(appointment: Appointment) {
+                feePaidBy: appointment.feePaidBy,
 
-    const rateMoneyToDollar = await getRateToDollar(appointment.amount, appointment.feePaidBy);
+                amount: appointment.amount,
 
-    appointment.amountInAmericanDollar = rateMoneyToDollar;
-
-    const doc = new AppointmentModel(
-        {
-            petId: appointment.petId,
-
-            startTime: appointment.startTime,
-
-            endTime: appointment.endTime,
-
-            description: appointment.description,
-
-            feePaidBy: appointment.feePaidBy,
-
-            amount: appointment.amount,
-
-            amountInAmericanDollar: appointment.amountInAmericanDollar,
-        });
-
-
-    await doc.save();
-
-    appointment._id = doc._id;
-
-    return appointment;
-}
-
-export async function getRateToDollar(moneyAmount: number, feePaidBy: string) {
-
-    let rateMoneyToDollar = moneyAmount;
-
-    if (checkifCandianDollar(feePaidBy) || checkifEuro(feePaidBy)) {
-
-        let rateCAN: number = 1.0;
-        let rateEuro: number = 1.0;
-
-        // req from rate api
-        await axios({
-            method: 'get',
-            url: `https://open.er-api.com/v6/latest/USD`,
-        })
-            .then(function (response: any) {
-                rateCAN = response.data.rates.CAD;
-                rateEuro = response.data.rates.EUR;
-
-            }).catch(e => {
-                console.log({
-                    message: "oops :(",
-                    error: e,
-                })
+                amountInAmericanDollar: appointment.amountInAmericanDollar,
             });
 
 
-        if (checkifCandianDollar(feePaidBy)) {
-            rateMoneyToDollar = moneyAmount / rateCAN;
+        await doc.save();
+
+        appointment._id = doc._id;
+
+        return appointment;
+    }
+    async getRateToDollar(moneyAmount: number, feePaidBy: string): Promise<any> {
+        let rateMoneyToDollar = moneyAmount;
+
+        if (this.checkifCandianDollar(feePaidBy) || this.checkifEuro(feePaidBy)) {
+
+            let rateCAN: number = 1.0;
+            let rateEuro: number = 1.0;
+
+            // req from rate api
+            await axios({
+                method: 'get',
+                url: `https://open.er-api.com/v6/latest/USD`,
+            })
+                .then(function (response: any) {
+                    rateCAN = response.data.rates.CAD;
+                    rateEuro = response.data.rates.EUR;
+
+                }).catch(e => {
+                    console.log({
+                        message: "oops :(",
+                        error: e,
+                    })
+                });
+
+
+            if (this.checkifCandianDollar(feePaidBy)) {
+                rateMoneyToDollar = moneyAmount / rateCAN;
+            }
+            else if (this.checkifEuro(feePaidBy)) {
+                rateMoneyToDollar = moneyAmount / rateEuro;
+            }
         }
-        else if (checkifEuro(feePaidBy)) {
-            rateMoneyToDollar = moneyAmount / rateEuro;
-        }
+
+        rateMoneyToDollar = TwoAfterThePointRound(rateMoneyToDollar);
+        return rateMoneyToDollar;
+    }
+    async getAppointmentsForDay(date: Date): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    async getAllUnpaidAppointments(): Promise<any> {
+        return await this.getAppointmentsByUnpaidFromDb();
+    }
+    async getAppointmentsByUnpaidFromDb(): Promise<any> {
+
+        return await AppointmentModel.find({ feePaidBy: 'unpaid' });
+
+    }
+    async getPatientBillById(id: string): Promise<any> {
+        let appointmentsUnpaid: Appointment[] = [];
+
+        await AppointmentModel.find({ petId: id, feePaidBy: 'unpaid' })
+            .then(async document => {
+                appointmentsUnpaid = document !== null ? document : appointmentsUnpaid;
+                return appointmentsUnpaid;
+            })
+            .catch(err => {
+                console.log("Error : ", err);
+            });
+
+        let totalUnpaid = 0.0;
+        appointmentsUnpaid.forEach(n => totalUnpaid += n.amount);
+
+
+        return totalUnpaid;
     }
 
-    rateMoneyToDollar = TwoAfterThePointRound(rateMoneyToDollar);
-    return rateMoneyToDollar;
-}
 
-export async function getAppointmentsForDay(date: Date) {
+    checkifEuro(moneyRate: string): boolean {
+        return moneyRate == '€' || moneyRate == 'EUR' || moneyRate == 'euro';
+    }
 
-    const appointments = await getAppointments();
-    const patientAppointments = appointments.filter(
-        n => {
-            if ((n.startTime.getDay() == date.getDay()) &&
-                (n.startTime.getMonth() == date.getMonth()) &&
-                (n.startTime.getFullYear() == date.getFullYear())) {
-                return true;
-            }
-            return false;
-        });
+    checkifCandianDollar(moneyRate: string): boolean {
+        return moneyRate == 'Canadian dollar' || moneyRate == 'C$' || moneyRate == 'Can$' || moneyRate == 'CAD$' || moneyRate == 'CAD';
+    }
 
 
-    return patientAppointments;
 }
 
 
-export async function getAllUnpaidAppointments() {
-
-    let getUnpaidAppointment: Appointment[];
-    getUnpaidAppointment = await getAppointmentsByUnpaidFromDb();
-    return getUnpaidAppointment;
-}
-
-export async function getAppointmentsByUnpaidFromDb() {
-    let appointmentsUnpaid: Appointment[] = [];
-
-    await AppointmentModel.find({ feePaidBy: 'unpaid' })
-        .then(async document => {
-            appointmentsUnpaid = document !== null ? document : appointmentsUnpaid;
-            return appointmentsUnpaid;
-        })
-        .catch(err => {
-            console.log("Error : ", err);
-        });
-
-    return appointmentsUnpaid;
-}
-
-function checkifEuro(moneyRate: string): boolean {
-    return moneyRate == '€' || moneyRate == 'EUR' || moneyRate == 'euro';
-}
-
-function checkifCandianDollar(moneyRate: string): boolean {
-    return moneyRate == 'Canadian dollar' || moneyRate == 'C$' || moneyRate == 'Can$' || moneyRate == 'CAD$' || moneyRate == 'CAD';
-}
-
-export async function getPatientBillById(id: string) {
-
-    let appointmentsUnpaid: Appointment[] = [];
-
-    await AppointmentModel.find({ petId: id, feePaidBy: 'unpaid' })
-        .then(async document => {
-            appointmentsUnpaid = document !== null ? document : appointmentsUnpaid;
-            return appointmentsUnpaid;
-        })
-        .catch(err => {
-            console.log("Error : ", err);
-        });
-
-    let totalUnpaid = 0.0;
-    appointmentsUnpaid.forEach(n => totalUnpaid += n.amount);
-
-
-    return totalUnpaid;
-}
 
 const appointmentsDummy: Appointment[] =
     [
