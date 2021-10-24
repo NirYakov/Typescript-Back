@@ -30,21 +30,40 @@ export async function getAppointmentDay(req: Request, res: Response) {
 
 export async function addAppointment(req: Request, res: Response) {
 
+    const { petId, startTime, endTime, description, feePaidBy, amount } = req.body;
+
+    let startTimeDate: Date = new Date();
+    let endTimeDate: Date = new Date();
+
+
+    if (!petId || !description || !feePaidBy || !amount || !startTime || !endTime) {
+        return res.sendStatus(404);
+    }
+
+    try {
+        startTimeDate = new Date(startTime);
+        endTimeDate = new Date(endTime);
+    }
+    catch (err) {
+        console.log("Dates are not in the right format !!");
+        return res.sendStatus(404);
+    }
+
     const appointment: Appointment =
     {
-        petId: req.body.petId,
+        petId: petId,
 
-        startTime: new Date(req.body.startTime),
+        startTime: startTimeDate,
 
-        endTime: new Date(req.body.endTime),
+        endTime: endTimeDate,
 
-        description: req.body.description,
+        description: description,
 
-        feePaidBy: req.body.feePaidBy,
+        feePaidBy: feePaidBy,
 
-        amount: req.body.amount,
+        amount: amount,
 
-        amountInAmericanDollar: req.body.amount
+        amountInAmericanDollar: amount
     };
 
     const appointmentResult = await addNewAppointment(appointment);

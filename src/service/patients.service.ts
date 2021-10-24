@@ -87,10 +87,6 @@ export async function getPatientByIdFromDb(id: string) {
 
 
 
-// const subs = await CompetitionModel.findOneAndUpdate(
-// { id: req.params.id }, // <------ req.params.id is what you should pass.
-// { subscriptions: req.body },
-// )
 
 
 
@@ -99,24 +95,24 @@ export async function getPatientByIdFromDb(id: string) {
 export async function getPetFood(): Promise<string> {
     let petTypeFood = "";
     const rndFoodIndex = getRandomInt(12);
-
+    
 
     await axios({
         method: 'get',
         url: `https://world.openpetfoodfacts.org/api/v0/product/${petFoodBarcodes[rndFoodIndex]}.json`,
     })
-        .then(function (response: any) {
-            // response.data.pipe(fs.createWriteStream('ada_lovelace.jpg'))
+    .then(function (response: any) {
+        // response.data.pipe(fs.createWriteStream('ada_lovelace.jpg'))
             petTypeFood = response.data.product.product_name;
             return petTypeFood;
-
+            
         }).catch(e => {
             console.log({
                 message: "oops :(",
                 error: e,
             })
         });
-
+        
     return petTypeFood;
 }
 
@@ -135,7 +131,7 @@ const petFoodBarcodes =
 
 
 
-const patientsDummy: Patient[] =
+    const patientsDummy: Patient[] =
     [
         {
             _id: "0",
@@ -147,7 +143,7 @@ const patientsDummy: Patient[] =
             ownerName: "ray ray",
 
             ownerAddress: "holon",
-
+            
             ownerPhone: "050-1112230",
 
             petTypeFood: "Fusées"
@@ -159,7 +155,7 @@ const patientsDummy: Patient[] =
             petType: "cat",
 
             ownerName: "ben ben",
-
+            
             ownerAddress: "ramat gan",
 
             ownerPhone: "050-1112239",
@@ -169,15 +165,15 @@ const patientsDummy: Patient[] =
         {
             _id: "2",
             petName: "yan",
-
+            
             petType: "mouse",
 
             ownerName: "yan yan",
-
+            
             ownerAddress: "tel aviv yafo",
 
             ownerPhone: "059-1112239",
-
+            
             petTypeFood: "Salmon and Sweet Potato Recipe Dog Food"
         },
         {
@@ -185,13 +181,13 @@ const patientsDummy: Patient[] =
             petName: "may",
 
             petType: "fox",
-
+            
             ownerName: "may may",
 
             ownerAddress: "holon",
-
+            
             ownerPhone: "050-1112232",
-
+            
             petTypeFood: "Leckerlie Mix"
         },
         {
@@ -199,13 +195,18 @@ const patientsDummy: Patient[] =
             petName: "ran",
 
             petType: "cat",
-
+            
             ownerName: "ran ran",
-
+            
             ownerAddress: "ramat gan",
-
+            
             ownerPhone: "050-1112234",
-
+            
             petTypeFood: "Salchicha con ternera y zanahoria"
         },
     ];
+    
+    // const subs = await CompetitionModel.findOneAndUpdate(
+    // { id: req.params.id }, // <------ req.params.id is what you should pass.
+    // { subscriptions: req.body },
+    // )
