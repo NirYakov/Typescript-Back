@@ -1,7 +1,9 @@
-import { AppointmentService, AppointmentServiceMock } from "./appointments.service";
+import { AppointmentService } from "./appointments.service";
 import { IAppointmentService } from "./interfaces-services/appointments.interface";
 import { IPatientsService } from "./interfaces-services/patients.interface";
-import { PatientsService, PatientsServiceMock } from "./patients.service";
+import { AppointmentServiceMock } from "./MockServices/appointment.service.mock";
+import { PatientsServiceMock } from "./MockServices/patients.service.mock";
+import { PatientsService } from "./patients.service";
 
 //const diPateintSevice: IPatientsService = new PatientsService();
 // const diPateintSevice: IPatientsService = new PatientsServiceMock();

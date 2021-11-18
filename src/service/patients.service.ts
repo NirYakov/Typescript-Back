@@ -61,47 +61,7 @@ export class PatientsService implements IPatientsService {
 
 }
 
-export class PatientsServiceMock implements IPatientsService {
 
-    getPatients(): Promise<any> {
-
-        console.log("Hey Threre :) !!")
-        return new Promise<any>((res, rej) => {
-            res({ What: "Whattttt !!" });
-        });
-    }
-
-    deletePatientById(id: string): Promise<any> {
-        return new Promise<any>((res, rej) => {
-            res({ deleted: `some user deleted id ${id}` });
-        });
-    }
-
-    addNewPatient(patient: Patient): Promise<any> {
-        return new Promise<any>((res, rej) => {
-            res({ newPatient: patient });
-        });
-    }
-
-    getPatientById(id: string): Promise<any> {
-        return this.getPatientByIdFromDb(id);
-    }
-
-    getPatientByIdFromDb(id: string): Promise<any> {
-        return new Promise<any>((res, rej) => {
-            res({
-                _id: "617304e3166a38931b9300c4",
-                petName: 'may',
-                petType: 'fox',
-                ownerName: 'may may',
-                ownerAddress: 'MOCK DATA',
-                ownerPhone: '050-1112232',
-                petTypeFood: "Ultra Premium Direct Chat Adulte Stérilisé - Chat d'intérieur"
-            });
-        });
-    }
-
-}
 
 // export async function getPatients(): Promise<any> {
 //     return await PatientModel.find();
